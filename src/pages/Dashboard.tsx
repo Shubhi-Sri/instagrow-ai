@@ -1,17 +1,12 @@
 import { AppShell } from "@/components/AppShell";
 import { StatCard } from "@/components/StatCard";
 import { mockPosts, mockEngagementTrend, mockLikesPerPost } from "@/lib/mock-data";
-import { BarChart3, TrendingUp, ThumbsUp, ThumbsDown } from "lucide-react";
+import { useInstagram } from "@/hooks/use-instagram";
+import { BarChart3, TrendingUp, ThumbsUp, ThumbsDown, Instagram, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
 const avgEngagement = (mockPosts.reduce((a, p) => a + p.engagement_rate, 0) / mockPosts.length).toFixed(1);
@@ -19,12 +14,38 @@ const bestPost = mockPosts.reduce((a, b) => (a.engagement_rate > b.engagement_ra
 const worstPost = mockPosts.reduce((a, b) => (a.engagement_rate < b.engagement_rate ? a : b));
 
 export default function DashboardPage() {
+  const { account, loading, connectInstagram } = useInstagram();
+
+  const handleConnect = async () => {
+    try {
+      await connectInstagram();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to start connection");
+    }
+  };
+
   return (
     <AppShell>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Your Instagram analytics at a glance</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Your Instagram analytics at a glance</p>
+          </div>
+          {loading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          ) : account ? (
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2">
+              <Instagram className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">@{account.username}</span>
+              <span className="h-2 w-2 rounded-full bg-success" />
+            </div>
+          ) : (
+            <Button onClick={handleConnect}>
+              <Instagram className="h-4 w-4" />
+              Connect Instagram Account
+            </Button>
+          )}
         </div>
 
         {/* Stat Cards */}
@@ -57,7 +78,6 @@ export default function DashboardPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          {/* Engagement Trend */}
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="mb-4 font-display text-sm font-semibold text-card-foreground">Engagement Trend</h3>
             <ResponsiveContainer width="100%" height={280}>
@@ -65,27 +85,11 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="engagement"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2.5}
-                  dot={{ fill: "hsl(var(--primary))", strokeWidth: 0, r: 4 }}
-                  activeDot={{ r: 6, fill: "hsl(var(--primary))" }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }} />
+                <Line type="monotone" dataKey="engagement" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ fill: "hsl(var(--primary))", strokeWidth: 0, r: 4 }} activeDot={{ r: 6, fill: "hsl(var(--primary))" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Likes Per Post */}
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="mb-4 font-display text-sm font-semibold text-card-foreground">Likes Per Post</h3>
             <ResponsiveContainer width="100%" height={280}>
@@ -93,14 +97,7 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="post" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }} />
                 <Bar dataKey="likes" fill="hsl(var(--secondary))" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
