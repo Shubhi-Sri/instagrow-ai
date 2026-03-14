@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Posts from "./pages/Posts";
 import Suggestions from "./pages/Suggestions";
 import Settings from "./pages/Settings";
+import InstagramCallback from "./pages/InstagramCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/posts" element={<Posts />} />
           <Route path="/suggestions" element={<Suggestions />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/instagram/callback" element={<InstagramCallback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,1 +1,7 @@
 project_id = "szcxylmqivxwrestqrrh"
+
+[functions.instagram-connect]
+verify_jwt = false
+
+[functions.instagram-app-id]
+verify_jwt = false
