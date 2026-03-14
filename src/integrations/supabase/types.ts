@@ -14,7 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_suggestions: {
+        Row: {
+          captions: Json | null
+          created_at: string
+          hashtags: Json | null
+          hooks: Json | null
+          id: string
+          reel_ideas: Json | null
+          user_id: string
+        }
+        Insert: {
+          captions?: Json | null
+          created_at?: string
+          hashtags?: Json | null
+          hooks?: Json | null
+          id?: string
+          reel_ideas?: Json | null
+          user_id: string
+        }
+        Update: {
+          captions?: Json | null
+          created_at?: string
+          hashtags?: Json | null
+          hooks?: Json | null
+          id?: string
+          reel_ideas?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      instagram_accounts: {
+        Row: {
+          access_token: string
+          connected_at: string
+          id: string
+          instagram_user_id: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          id?: string
+          instagram_user_id: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          id?: string
+          instagram_user_id?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      post_analysis: {
+        Row: {
+          ai_feedback: string | null
+          caption_score: number | null
+          created_at: string
+          engagement_rate: number | null
+          hook_score: number | null
+          id: string
+          post_id: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          caption_score?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          hook_score?: number | null
+          id?: string
+          post_id: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          caption_score?: number | null
+          created_at?: string
+          engagement_rate?: number | null
+          hook_score?: number | null
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_analysis_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          caption: string | null
+          comment_count: number | null
+          created_at: string
+          id: string
+          instagram_post_id: string
+          like_count: number | null
+          media_type: string | null
+          media_url: string | null
+          timestamp: string | null
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          comment_count?: number | null
+          created_at?: string
+          id?: string
+          instagram_post_id: string
+          like_count?: number | null
+          media_type?: string | null
+          media_url?: string | null
+          timestamp?: string | null
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          comment_count?: number | null
+          created_at?: string
+          id?: string
+          instagram_post_id?: string
+          like_count?: number | null
+          media_type?: string | null
+          media_url?: string | null
+          timestamp?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
