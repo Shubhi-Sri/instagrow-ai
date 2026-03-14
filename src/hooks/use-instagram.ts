@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-// Instagram App ID is a publishable key, safe to use client-side
-const INSTAGRAM_APP_ID = "YOUR_INSTAGRAM_APP_ID";
 
 interface InstagramAccount {
   id: string;
@@ -15,11 +12,7 @@ export function useInstagram() {
   const [account, setAccount] = useState<InstagramAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAccount();
-  }, []);
-
-  async function fetchAccount() {
+  const fetchAccount = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("instagram_accounts")
@@ -35,12 +28,31 @@ export function useInstagram() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  function connectInstagram() {
+  useEffect(() => {
+    fetchAccount();
+  }, [fetchAccount]);
+
+  async function connectInstagram() {
+    // Fetch app ID from edge function
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/instagram-app-id`,
+      {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+      }
+    );
+    const { app_id } = await response.json();
+
+    if (!app_id) {
+      throw new Error("Instagram App ID not configured");
+    }
+
     const redirectUri = `${window.location.origin}/instagram/callback`;
     const scope = "instagram_business_basic,instagram_business_manage_insights";
-    const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${INSTAGRAM_APP_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}`;
+    const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${app_id}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}`;
     window.location.href = authUrl;
   }
 
