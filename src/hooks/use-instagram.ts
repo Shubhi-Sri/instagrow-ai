@@ -50,9 +50,21 @@ export function useInstagram() {
       throw new Error("Instagram App ID not configured");
     }
 
+    // TODO: This redirect URI MUST match exactly the value configured in
+    // Meta Developer Console → App Settings → Valid OAuth Redirect URIs
     const redirectUri = `${window.location.origin}/instagram/callback`;
     const scope = "instagram_business_basic,instagram_business_manage_insights";
-    const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${app_id}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}`;
+
+    // Use the Facebook/Meta OAuth dialog for Instagram Graph API scopes
+    // See: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login
+    const authUrl =
+      `https://www.instagram.com/oauth/authorize` +
+      `?enable_fb_login=0` +
+      `&force_authentication=1` +
+      `&client_id=${app_id}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent(scope)}`;
     window.location.href = authUrl;
   }
 
